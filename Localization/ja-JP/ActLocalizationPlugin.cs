@@ -3,6 +3,10 @@ using System.Reflection;
 using System.Windows.Forms;
 using Advanced_Combat_Tracker;
 
+[assembly: AssemblyTitle("ActLocalization ja-JP")]
+[assembly: AssemblyDescription("An ACT plugin that changes localization to ja-JP strings.")]
+[assembly: AssemblyVersion("267.0.0.0")]
+
 namespace ActLocalization
 {
     internal class ActLocalizationPlugin : IActPluginV1
