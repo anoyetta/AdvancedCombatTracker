@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActLocalizationPlugin.cs" />
-    <Compile Include="Advanced Combat Tracker.exe.InternalStrings.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Advanced Combat Tracker.exe.FormActMain.xml" />

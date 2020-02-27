@@ -1,11 +1,13 @@
-﻿using System.IO;
+using System;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Xml;
 using Advanced_Combat_Tracker;
 
 [assembly: AssemblyTitle("ActLocalization ja-JP")]
-[assembly: AssemblyDescription("An ACT plugin that changes localization to ja-JP strings.")]
-[assembly: AssemblyVersion("267.0.0.0")]
+[assembly: AssemblyDescription("ja-JP locale strings for Advanced Combat Tracker.")]
+[assembly: AssemblyVersion("268.0.0.0")]
 
 namespace ActLocalization
 {
@@ -13,12 +15,22 @@ namespace ActLocalization
     {
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
         {
-            ActLocalization.InternalStrings.EditLocalizations();
+            // XML resource alternative to using the *.cs plugin method above
+            Assembly asm = Assembly.GetExecutingAssembly();
+            using (Stream s = asm.GetManifestResourceStream("ActLocalization.Advanced Combat Tracker.exe.InternalStrings.xml"))
+            {
+                XmlTextReader xml = new XmlTextReader(s);
+                while (xml.Read())
+                {
+                    if (xml.NodeType == XmlNodeType.Element && xml.Name == "string")
+                    {
+                        TryEditLocalization(xml.GetAttribute("key"), xml.GetAttribute("value"));
+                    }
+                }
+            }
 
             if (ActGlobals.oFormActMain.InitActDone == false)   // Will throw a lot of exceptions if loaded after startup
             {
-                Assembly asm = Assembly.GetExecutingAssembly();
-
                 using (Stream s = asm.GetManifestResourceStream("ActLocalization.Advanced Combat Tracker.exe.FormActMain.xml"))
                     ActGlobals.oFormActMain.ImportControlTextXML(s);
                 using (Stream s = asm.GetManifestResourceStream("ActLocalization.Advanced Combat Tracker.exe.FormAlliesEdit.xml"))
@@ -63,6 +75,17 @@ namespace ActLocalization
 
             pluginStatusText.Text = "Localization Complete";
             pluginScreenSpace.Parent.Controls.Remove(pluginScreenSpace);
+        }
+
+        internal static bool TryEditLocalization(string Key, string Value)
+        {
+            if (ActGlobals.ActLocalization.LocalizationStrings.ContainsKey(Key))
+            {
+                ActGlobals.ActLocalization.LocalizationStrings[Key].DisplayedText = Value;
+                return true;
+            }
+            ActGlobals.oFormActMain.WriteDebugLog(String.Format("Localization key ({0}) does not exist.", Key));
+            return false;
         }
 
         public void DeInitPlugin()
